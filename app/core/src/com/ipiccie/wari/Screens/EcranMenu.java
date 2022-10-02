@@ -128,8 +128,8 @@ public class  EcranMenu extends ScreenAdapter {
         personnage.position.y = 32F;
         personnage.etat = Perso.Etat.Attend;
         etatDuJeu = EtatDuJeu.Accueil;
-        EcranJeux.Perso.HEIGHT = 90;
-        EcranJeux.Perso.WIDTH = (90*200)/260F;
+        Perso.HEIGHT = 90;
+        Perso.WIDTH = (90*200)/260F;
 
 
         camera = new OrthographicCamera();
@@ -215,8 +215,8 @@ public class  EcranMenu extends ScreenAdapter {
             }
         }
         //TODO: allonger img trainnée pur flip
-        batch.draw(img2,personnage.position.x - EcranJeux.Perso.WIDTH/2,personnage.position.y, EcranJeux.Perso.WIDTH*3/2, EcranJeux.Perso.HEIGHT);
-        batch.draw(img,personnage.position.x,personnage.position.y, EcranJeux.Perso.WIDTH, EcranJeux.Perso.HEIGHT);
+        batch.draw(img2,personnage.position.x - Perso.WIDTH/2,personnage.position.y, Perso.WIDTH*3/2, Perso.HEIGHT);
+        batch.draw(img,personnage.position.x,personnage.position.y, Perso.WIDTH, Perso.HEIGHT);
     }
 
     public void majJeu(float deltaTime){
@@ -260,7 +260,7 @@ public class  EcranMenu extends ScreenAdapter {
             if (etatDuJeu == EtatDuJeu.Equipement && personnage.position.y+ personnage.HEIGHT<0){
                 jeu.setScreen(new EcranEquipement(jeu));
             }
-            if(etatDuJeu == EtatDuJeu.Boutique && personnage.position.x + EcranJeux.Perso.WIDTH<0){
+            if(etatDuJeu == EtatDuJeu.Boutique && personnage.position.x + Perso.WIDTH<0){
                 jeu.setScreen(new EcranBoutique(jeu));
             }
         }
@@ -499,9 +499,9 @@ public class  EcranMenu extends ScreenAdapter {
         Accueil,ListeJeux,Boutique,Equipement
     }
 
-    private static class Perso{
-        float WIDTH;
-        float HEIGHT;
+    static class Perso{
+        static float WIDTH;
+        static float HEIGHT;
         boolean retourne = false;
 
         enum Etat {

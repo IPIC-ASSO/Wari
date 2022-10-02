@@ -281,7 +281,7 @@ public class EcranInfini extends ScreenAdapter {
         position.mulAdd(personnage.velocite,deltaTime);
         Rectangle persoRect = piscineRectangle.obtain();
         position.y-= 0;
-        EcranJeux.Perso.WIDTH -= 2;
+        Perso.WIDTH -= 2;
         //hitbox du personnage
         persoRect.set((position.x+1)/echelle,position.y/echelle,(Perso.WIDTH - 2)/echelle, Perso.HEIGHT/echelle);
         TiledMapTileLayer obstacles = (TiledMapTileLayer) carte.getLayers().get("obstacles");
@@ -327,7 +327,7 @@ public class EcranInfini extends ScreenAdapter {
         //verification droite
         position = new Vector2(personnage.position.x, personnage.position.y);
         position.y += 0;
-        EcranJeux.Perso.WIDTH += 2;
+        Perso.WIDTH += 2;
         position.x+= 5;
         //hitbox du personnage
         persoRect.set(position.x/echelle ,position.y/echelle, (Perso.WIDTH)/echelle +2, Perso.HEIGHT/echelle);
