@@ -34,14 +34,14 @@ public class EcranEquipement extends ScreenAdapter {
     ActiviteduJeu jeu;
     private Stage etage;
     private OrthographicCamera camera;
-    private Viewport porteVue;
+    private Viewport porteVue;  //zone de la vue
     private Image image;
     private Image image3;
     private Preferences prefs;
     private Texture notreHeros;
     private Texture etatEquipement;
     private Integer[] nbPrem = {1,2,3,5,7,11,13,17,19,23,29};
-    Toast.ToastFactory usineDeBiscotteGrillees;
+    Toast.ToastFactory usineDeBiscotteGrillees;     //affiche des toasts !
     Toast tartine;
 
 
