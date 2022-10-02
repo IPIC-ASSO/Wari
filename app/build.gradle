@@ -84,7 +84,11 @@ project(":ios") {
         api "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
         implementation 'com.github.raeleus.stripe:stripe:1.4.1'
-        
+    }
+
+    robovm {
+        iosSkipSigning = true
+        archs = "thumbv7:arm64"
     }
 }
 

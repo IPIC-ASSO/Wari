@@ -1,5 +1,6 @@
 package com.ipiccie.wari;
 
+import com.badlogic.gdx.Files;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.ipiccie.wari.ActiviteduJeu;
@@ -10,6 +11,7 @@ public class DesktopLauncher {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setForegroundFPS(60);
 		config.setTitle("Le Projet Wari");
+		config.setWindowIcon("logo.png");
 		new Lwjgl3Application(new ActiviteduJeu(), config);
 	}
 }
