@@ -67,7 +67,7 @@ public class EcranEquipement extends ScreenAdapter {
         Gdx.input.setInputProcessor(etage);
 
         notreHeros = new Texture("notre_heros.png");
-        etatEquipement = new Texture("icons_equipement.png");
+        etatEquipement = new Texture("icons_equipement.png");   //équipé ou bloqué
         final Table tableDefillante1 = new Table();
         final ScrollPane defile1 = new ScrollPane(tableDefillante1);
         final Table table = new Table();
@@ -97,7 +97,8 @@ public class EcranEquipement extends ScreenAdapter {
         int mesPersos = prefs.getInteger("perso_possedes",10);
         Image image2;
         image3 = new Image(TextureRegion.split(etatEquipement,tuileL,tuileH)[1][0]);
-        for(int y = 0; y < notreHeros.getHeight()/tuileH; y++ ){
+        image3.setSize((camera.viewportHeight/2F)*(tuileL/(float)tuileH),camera.viewportHeight/2F);
+        for(int y = 0; y < notreHeros.getHeight()/tuileH; y++ ){        //liste des personnages visibles
             image = new Image(TextureRegion.split(notreHeros,tuileL,tuileH)[y][7]);
             final int finalY = y;
             final Image imageF = image;
@@ -105,10 +106,11 @@ public class EcranEquipement extends ScreenAdapter {
             group.debug();
             image.setSize((camera.viewportHeight/2F)*(tuileL/(float)tuileH),camera.viewportHeight/2F);
             group.addActor(image);
-            if ((mesPersos%nbPrem[y]) != 0){
+            if ((mesPersos%nbPrem[y]) != 0){    //si perso bloqué
                 image2 = new Image(TextureRegion.split(etatEquipement,tuileL,tuileH)[0][0]);
+                image2.setSize((camera.viewportHeight/2F)*(tuileL/(float)tuileH),camera.viewportHeight/2F);
                 group.addActor(image2);
-            } else  if (prefs.getInteger("perso",0) == y){
+            } else  if (prefs.getInteger("perso",0) == y){  //si le perso est équipé
                 group.addActor(image3);
             }
             tableDefillante1.add(group).size((camera.viewportHeight/2F)*(tuileL/(float)tuileH),camera.viewportHeight/2F);
