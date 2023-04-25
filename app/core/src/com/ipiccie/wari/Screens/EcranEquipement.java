@@ -127,9 +127,9 @@ public class EcranEquipement extends ScreenAdapter {
             });
         }
         Label or = new Label(String.valueOf(prefs.getInteger("argent",50)),skin);
-        miniTable.add(new Image(TextureRegion.split(new Texture("icons.png"),32,32)[7][0]));
+        miniTable.add(new Image(TextureRegion.split(new Texture("icons2.png"),32,32)[7][0]));
         miniTable.add(or).grow().padLeft(2).padRight(10);
-        miniTable.add(new Image(TextureRegion.split(new Texture("icons.png"),32,32)[8][0]));
+        miniTable.add(new Image(TextureRegion.split(new Texture("icons2.png"),32,32)[8][0]));
 
         table.setFillParent(true);
         table.setSkin(skin);

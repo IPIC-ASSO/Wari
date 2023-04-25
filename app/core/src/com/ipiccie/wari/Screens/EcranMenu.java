@@ -4,6 +4,7 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -48,6 +49,7 @@ public class  EcranMenu extends ScreenAdapter {
     private MapLayers layers;
     private float MONDE_LARGEUR;
     private float MONDE_HAUTEUR;
+    public Music laMusiqueTropB1;
     private int echelle;
     private OrthogonalTiledMapRenderer rendu;
     private OrthographicCamera camera;
@@ -70,8 +72,8 @@ public class  EcranMenu extends ScreenAdapter {
     private Animation<TextureRegion> marcheT;
     private Animation<TextureRegion> sauteT;
     private boolean dialogue = false;
-    private int GRAVITE = -8;
-    private int GRAVITE_LATERAL = 550;
+    private static final int GRAVITE = -8;
+    private static final int GRAVITE_LATERAL = 550;
     private EtatDuJeu etatDuJeu;
     private boolean mouvement = false;
     private final Pool<Rectangle> piscineRectangle = new Pool<Rectangle>() {
@@ -130,6 +132,9 @@ public class  EcranMenu extends ScreenAdapter {
         etatDuJeu = EtatDuJeu.Accueil;
         Perso.HEIGHT = 90;
         Perso.WIDTH = (90*200)/260F;
+        laMusiqueTropB1 = Gdx.audio.newMusic(Gdx.files.internal("musique_ambiance.mp3"));
+        laMusiqueTropB1.setLooping(true);
+        laMusiqueTropB1.play();
 
 
         camera = new OrthographicCamera();
@@ -155,7 +160,7 @@ public class  EcranMenu extends ScreenAdapter {
     public void render(float delta) {
         Gdx.gl.glClearColor(0,0,1,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        float deltaTime = Gdx.graphics.getDeltaTime();
+            float deltaTime = Gdx.graphics.getDeltaTime();
         personnage.etatTemporel += deltaTime;
         if (!dialogue) ecouteur();
         majJeu(deltaTime);
@@ -184,19 +189,19 @@ public class  EcranMenu extends ScreenAdapter {
 
     public void renduPerso(){
         TextureRegion img  = null;
-        TextureRegion img2  = null;
+        //TextureRegion img2  = null;
         switch (personnage.etat){
             case Attend:
                 img = attend.getKeyFrame(personnage.etatTemporel);
-                img2 = marcheT.getKeyFrame(personnage.etatTemporel);
+                //img2 = marcheT.getKeyFrame(personnage.etatTemporel);
                 break;
             case Marche:
                 img = marche.getKeyFrame(personnage.etatTemporel);
-                img2 = marcheT.getKeyFrame(personnage.etatTemporel);
+                //img2 = marcheT.getKeyFrame(personnage.etatTemporel);
                 break;
             case Vole:
                 img = saute.getKeyFrame(personnage.etatTemporel);
-                img2 = sauteT.getKeyFrame(personnage.etatTemporel);
+                //img2 = sauteT.getKeyFrame(personnage.etatTemporel);
                 break;
             default:
                 break;
@@ -204,18 +209,18 @@ public class  EcranMenu extends ScreenAdapter {
         if (personnage.retourne){
             if (!img.isFlipX()){
                 img.flip(true,false);
-                img2.flip(true,false);
+                //img2.flip(true,false);
             }
         }else{
-            if(img2.isFlipX()){
+            /*if(img2.isFlipX()){
                 img2.flip(true,false);
-            }
+            }*/
             if (img.isFlipX()){
                 img.flip(true,false);
             }
         }
         //TODO: allonger img trainnée pur flip
-        batch.draw(img2,personnage.position.x - Perso.WIDTH/2,personnage.position.y, Perso.WIDTH*3/2, Perso.HEIGHT);
+        //batch.draw(img2,personnage.position.x - Perso.WIDTH/2,personnage.position.y, Perso.WIDTH*3/2, Perso.HEIGHT);
         batch.draw(img,personnage.position.x,personnage.position.y, Perso.WIDTH, Perso.HEIGHT);
     }
 
@@ -258,9 +263,11 @@ public class  EcranMenu extends ScreenAdapter {
                 personnage.retourne = false;
             }
             if (etatDuJeu == EtatDuJeu.Equipement && personnage.position.y+ personnage.HEIGHT<0){
+                if (laMusiqueTropB1!=null)laMusiqueTropB1.stop();
                 jeu.setScreen(new EcranEquipement(jeu));
             }
             if(etatDuJeu == EtatDuJeu.Boutique && personnage.position.x + Perso.WIDTH<0){
+                if (laMusiqueTropB1!=null)laMusiqueTropB1.stop();
                 jeu.setScreen(new EcranBoutique(jeu));
             }
         }
@@ -296,6 +303,7 @@ public class  EcranMenu extends ScreenAdapter {
                             etatDuJeu = EtatDuJeu.ListeJeux;
                             mouvement = true;
                         }else if(calque.getCell(x,y).getTile().getTextureRegion().getTexture()== infini){
+                            if (laMusiqueTropB1!=null)laMusiqueTropB1.stop();
                             jeu.setScreen(new EcranInfini(jeu));
                         }else if(calque.getCell(x,y).getTile().getTextureRegion().getTexture() == equipement){
                             etatDuJeu = EtatDuJeu.Equipement;
@@ -360,6 +368,7 @@ public class  EcranMenu extends ScreenAdapter {
         batch.dispose();
         carte.dispose();
         rendu.dispose();
+        laMusiqueTropB1.dispose();
     }
 
     public void creerCarte(TiledMapTileLayer calque1, TiledMapTileLayer calque2){
@@ -370,7 +379,7 @@ public class  EcranMenu extends ScreenAdapter {
         infini = new Texture("Bouton_infini.png");
         defi = new Texture("Bouton_defi.png");
         histoire = new Texture("Bouton_histoire.png");
-        retour = new Texture("icons.png");
+        retour = new Texture("icons2.png");
         Texture logo = new Texture( ("logo_sans_fond_2.png"));
         int debLogoX = (int) (MONDE_LARGEUR/2F - (logo.getWidth()/2F )/echelle);
         int debLogoY = (508/echelle);

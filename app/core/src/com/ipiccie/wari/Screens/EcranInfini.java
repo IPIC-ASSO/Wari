@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -29,12 +30,14 @@ public class EcranInfini extends ScreenAdapter {
     ActiviteduJeu jeu;
     private TiledMap carte;
     private MapLayers layers;
-    private static final float GRAVITE = -20;           //fait descendre le perso
-    private static final float LATERAL_GRAVITE = 60;    //fait avancer le perso
-    private static final float VAL_IMPULSION_SAUT = 850;//puissance de saut
-    private static final float BONUS_X = 11;            //différence vitesse écran/perso
-    private static final float VITESSE_MAX_X = 220;
-    private static final float VITESSE_MAX_Y = 395;
+    private static final float GRAVITE = -44;           //fait descendre le perso
+    private static final float LATERAL_GRAVITE = 120;    //fait avancer le perso
+    private static final float VAL_IMPULSION_SAUT =1700;//puissance de saut
+    private static final float BONUS_X = 22;            //différence vitesse écran/perso
+    private static final float VITESSE_MAX_X = 460;
+    private static final float VITESSE_MAX_Y = 830;
+    private int numFond = 0;
+    private int pos_fond = -10;
     private float MONDE_LARGEUR;
     private float MONDE_HAUTEUR;
     private float PERSO_DEBUT_X;
@@ -43,7 +46,7 @@ public class EcranInfini extends ScreenAdapter {
     private OrthogonalTiledMapRenderer rendu;
     private OrthographicCamera camera;
     private Perso personnage;
-    private Music laMusiqueTropB1;  //à implémenter
+    private Music laMusiqueTropB1;
     private TextureRegion versMenu;
     private TextureRegion rejouer;
     private TextureRegion argent;
@@ -56,6 +59,7 @@ public class EcranInfini extends ScreenAdapter {
     private Animation<TextureRegion> attendT;   //animation de la trainée
     private Animation<TextureRegion> marcheT;
     private Animation<TextureRegion> sauteT;
+    private Sprite fond;
     private BitmapFont police;
     private Preferences prefs;
     Vector2 vecteurGravite = new Vector2();
@@ -83,11 +87,11 @@ public class EcranInfini extends ScreenAdapter {
         layers = carte.getLayers();
         float largeur = Gdx.graphics.getWidth();
         float hauteur = Gdx.graphics.getHeight();
-        TiledMapTileLayer calque1 = new TiledMapTileLayer(544, 13, 32, 32);     //largeur de la tuile fixée à 32. Le monde fait 13 tuiles de haut, et 544 de long
+        TiledMapTileLayer calque1 = new TiledMapTileLayer(2000, 13, 64, 64);     //largeur de la tuile fixée à 32. Le monde fait 13 tuiles de haut, et 2000 de long (voir MONDE_LARGEUR pour distance de tuiles posées)
         calque1.setName("sol");
         echelle = calque1.getTileWidth();
         MONDE_HAUTEUR = calque1.getHeight();
-        MONDE_LARGEUR = calque1.getWidth();
+        MONDE_LARGEUR = 200;//largeur des tuiles posées; 2 autres champs à modifier si changement de valeur
         PERSO_DEBUT_Y = echelle * 3F;   //hauteur du personnage au début du jeu
         TiledMapTileLayer calque2 = new TiledMapTileLayer(calque1.getWidth(), calque1.getHeight(), echelle, echelle);
         TiledMapTileLayer calque3 = new TiledMapTileLayer(calque1.getWidth(), calque1.getHeight(), echelle, echelle);
@@ -95,9 +99,10 @@ public class EcranInfini extends ScreenAdapter {
         calque3.setName("special");     //objets spéciaux (argent, fin de niveau, easter egg... bref tout le reste)
         camera = new OrthographicCamera();  //caméra, permet de gérer ce que voit l'utilisateur
         camera.setToOrtho(false,13*echelle*(largeur / hauteur),13F * echelle);
+        //layers.add(new TiledMapImageLayer(new TextureRegion(new Texture("Paysage_WARI_1.png")),0,0));
         layers.add(calque1);
+        layers.add(calque3);    //obstacles devant pièces
         layers.add(calque2);
-        layers.add(calque3);
         rendu = new OrthogonalTiledMapRenderer(carte, 1); //met à l'échelle de la carte--> 1 unité = X px
         personnage = new Perso();
         Texture notreHeros = new Texture("notre_heros.png");    //textures de personnage
@@ -114,11 +119,27 @@ public class EcranInfini extends ScreenAdapter {
         marcheT.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);  //fait boucler l'animation en ping pong: 1-2-3-2-1-2-3-2...
         Perso.HEIGHT = 1.8F * echelle;
         Perso.WIDTH = 1.8F * echelle;
-        versMenu = new TextureRegion(new Texture("icons.png"),32,32);
-        rejouer = TextureRegion.split(new Texture("icons.png"),32,32)[1][0];
-        Epause = TextureRegion.split(new Texture("icons.png"),32,32)[5][0];
-        Mpause = TextureRegion.split(new Texture("icons.png"),32,32)[6][0];
-        argent = TextureRegion.split(new Texture("icons.png"),32,32)[7][0];
+        versMenu = new TextureRegion(new Texture("icons.png"),echelle,echelle);
+        rejouer = TextureRegion.split(new Texture("icons.png"),echelle,echelle)[1][0];
+        Epause = TextureRegion.split(new Texture("icons.png"),echelle,echelle)[5][0];
+        Mpause = TextureRegion.split(new Texture("icons.png"),echelle,echelle)[6][0];
+        argent = TextureRegion.split(new Texture("icons.png"),echelle,echelle)[7][0];
+        switch (MathUtils.random(1,4)) {
+            case 1:
+                fond = new Sprite(new Texture("Paysage_WARI_1.png"));
+                laMusiqueTropB1 = Gdx.audio.newMusic(Gdx.files.internal("musique_1.mp3"));
+                numFond=0;
+                break;
+            case 2:
+                fond = new Sprite(new Texture("Paysage_WARI_2.png"));
+                laMusiqueTropB1 = Gdx.audio.newMusic(Gdx.files.internal("musique_2.mp3"));
+                numFond=1;
+                break;
+            default:
+                fond = new Sprite(new Texture("Paysage_WARI_3.png"));
+                laMusiqueTropB1 = Gdx.audio.newMusic(Gdx.files.internal("musique_1.mp3"));
+                numFond=2;
+        }
 
         pret = new TextureRegion(new Texture("pret.png"));
         PERSO_DEBUT_X = camera.viewportWidth / 3;
@@ -134,8 +155,22 @@ public class EcranInfini extends ScreenAdapter {
         maJjeu();   //mise à jour des valeurs
         camera.update();    //MàJ de a caméra
         rendu.setView(camera);
+        dessineFond();
         rendu.render(); //rendu de la caméra et de la carte
         dessineJeu();   //rendu des textures
+    }
+
+    private void dessineFond() {
+        jeu.batch.begin();
+        if (camera.position.x>pos_fond+fond.getWidth()){
+            pos_fond=(int)(camera.position.x);
+        }
+        if(camera.position.x<pos_fond+fond.getWidth()){
+            jeu.batch.draw(fond,pos_fond-fond.getWidth(),0);
+        }
+        jeu.batch.draw(fond,pos_fond,0);
+        jeu.batch.draw(fond,pos_fond+fond.getWidth(),0);
+        jeu.batch.end();
     }
 
 
@@ -204,6 +239,7 @@ public class EcranInfini extends ScreenAdapter {
                 Rectangle posRejouer = new Rectangle(camera.viewportWidth / 2F - 3 * echelle, camera.viewportHeight / 2F - 3 * echelle, 2F * echelle, 2F * echelle);
 
                 if (touche.overlaps(posVersMenu)) {     //vers Menu
+                    if (laMusiqueTropB1!=null)laMusiqueTropB1.stop();
                     jeu.setScreen(new EcranMenu(jeu));
                 }
                 if (touche.overlaps(posRejouer)) {      //vers Rejouer
@@ -226,6 +262,7 @@ public class EcranInfini extends ScreenAdapter {
                 Rectangle posReprendre = new Rectangle(camera.viewportWidth / 2F - echelle, camera.viewportHeight / 2F - 3 * echelle, 2F * echelle, 2F * echelle);
 
                 if (touche.overlaps(posVersMenu)) { //vers menu
+                    if (laMusiqueTropB1!=null)laMusiqueTropB1.stop();
                     jeu.setScreen(new EcranMenu(jeu));
                 }else if (touche.overlaps(posRejouer)) {    //rejouer
                     etatDuJeu = EtatDuJeu.Lancement;
@@ -236,8 +273,9 @@ public class EcranInfini extends ScreenAdapter {
             }
         }
         if (etatDuJeu != EtatDuJeu.Pause) {
-            if (etatDuJeu != EtatDuJeu.Lancement)
+            if (etatDuJeu != EtatDuJeu.Lancement){
                 personnage.velocite.add(vecteurGravite); //implémente la gravité
+            }
             if (personnage.aTerre) {    //le personnage est au sol-> annimation marche
                 personnage.etat = Perso.Etat.Marche;
             }
@@ -266,10 +304,18 @@ public class EcranInfini extends ScreenAdapter {
             } else {
                 camera.position.mulAdd(new Vector3(personnage.velocite.x, personnage.velocite.y, 0F), deltaTime);
             }
+            pos_fond+=personnage.velocite.x/80;
 
             //ne pas sortir de la carte
             camera.position.x = MathUtils.clamp(camera.position.x, camera.viewportWidth / 2F, MONDE_LARGEUR * echelle - camera.viewportWidth / 2F);
             camera.position.y = MathUtils.clamp(camera.position.y, camera.viewportHeight / 2F, MONDE_HAUTEUR * echelle - camera.viewportHeight / 2F);
+
+            //création suite du jeu
+            if (camera.position.x>MONDE_LARGEUR*0.9*echelle){
+                MONDE_LARGEUR+=200;
+                creerCarte((TiledMapTileLayer) layers.get("sol"),(TiledMapTileLayer)layers.get("obstacles"), (TiledMapTileLayer)layers.get("special"), (int)MONDE_LARGEUR-200);
+                Gdx.app.debug("cinstr carte", String.valueOf(MONDE_LARGEUR));
+            }
         }
     }
 
@@ -415,12 +461,13 @@ public class EcranInfini extends ScreenAdapter {
         personnage.position.set(PERSO_DEBUT_X, PERSO_DEBUT_Y);
         personnage.velocite.set(0, 0);
         personnage.etat = Perso.Etat.Marche;
+        pos_fond = -10;
         vecteurGravite.set(LATERAL_GRAVITE, GRAVITE);
         creerCarte((TiledMapTileLayer) layers.get("sol"),(TiledMapTileLayer)layers.get("obstacles"), (TiledMapTileLayer)layers.get("special"), (int) (camera.viewportWidth/echelle));
         camera.position.set(camera.viewportWidth / 2F, camera.viewportHeight / 2F, 0);
-        //laMusiqueTropB1 = Gdx.audio.newMusic(Gdx.files.internal("musique_x.mp3"));
-        //laMusiqueTropB1.setLooping(true);
-        //laMusiqueTropB1.play();
+        if (laMusiqueTropB1!=null)laMusiqueTropB1.stop();
+        laMusiqueTropB1.setLooping(true);
+        laMusiqueTropB1.play();
 
         //lignes de code pour un jeu "moins lent" =)
         //BONUS_X = 11;
@@ -429,17 +476,21 @@ public class EcranInfini extends ScreenAdapter {
 
     //créer au hasard la crate
     public void creerCarte(TiledMapTileLayer sol, TiledMapTileLayer obstacles,TiledMapTileLayer special, int longueurE){
-        for (int x = 0; x<sol.getWidth();x++){
-            for (int y = 0; y< sol.getHeight();y++){
-                sol.setCell(x,y,null);
-                obstacles.setCell(x,y,null);
-                special.setCell(x,y,null);
+        //carte.getLayers().remove(sol);
+        if (longueurE<100){
+            for (int x = 0; x<sol.getWidth();x++){
+                for (int y = 0; y< sol.getHeight();y++){
+                    sol.setCell(x,y,null);
+                    obstacles.setCell(x,y,null);
+                    special.setCell(x,y,null);
+                }
             }
         }
         //sol de départ
-        TextureRegion tSol = new TextureRegion(new Texture("obstacle jeux IPC.PNG"),echelle,echelle);
-        TextureRegion tObstacles = new TextureRegion(new Texture("pics jeu png.png"),echelle,52);
-        TextureRegion tbillets = TextureRegion.split(new Texture("icons.png"),32,32)[9][0];
+        TextureRegion tSol = TextureRegion.split(new Texture("sol.png"),echelle,echelle)[numFond][0];
+        TextureRegion tSol2 = TextureRegion.split(new Texture("sol.png"),echelle,echelle)[0][1];
+        TextureRegion tObstacles = TextureRegion.split(new Texture("pics jeu png.png"),echelle,104)[numFond][0];
+        TextureRegion tbillets = TextureRegion.split(new Texture("icons.png"),echelle,echelle)[9][0];
         TiledMapTileLayer.Cell cellule = new TiledMapTileLayer.Cell();
         cellule.setTile(new StaticTiledMapTile(tSol));
         TiledMapTileLayer.Cell cellule2 = new TiledMapTileLayer.Cell();
@@ -451,47 +502,47 @@ public class EcranInfini extends ScreenAdapter {
         for(int x = 0; x<camera.viewportWidth/echelle ;x++){
             sol.setCell(x,0,cellule);
         }
-        int[][] carte = new int[(int)MONDE_LARGEUR-longueurE][(int)MONDE_HAUTEUR];
+        int[][] carteI = new int[(int)MONDE_LARGEUR-longueurE][(int)MONDE_HAUTEUR];
         int solution = 1;
         int x1 = 2;     //équilibre montées et descentes
         //algorithme hasardeux
-        for(int x=0; x< carte.length -1; x+=2){
+        for(int x=0; x< carteI.length -1; x+=2){
             int ancSol = solution;
             solution = MathUtils.random(Math.max(solution-2,1),Math.min(solution+x1,(int)MONDE_HAUTEUR-3));// défini si la prochaine tuile sera en haut ou en bas
             if (ancSol>solution){   //plus bas
-                carte[x][solution] = MathUtils.random(-10,0);// probabilité qu'un obstacle apparaisse
+                carteI[x][solution] = MathUtils.random(-10,0);// probabilité qu'un obstacle apparaisse
                 x1 = Math.min(x1+1,2);
             }else if (ancSol==solution){    //même niveau
                 x1 = Math.min(x1+1,2);
-                carte[x][solution] = MathUtils.random(-20,0);// probabilité qu'un obstacle apparaisse
+                carteI[x][solution] = MathUtils.random(-20,0);// probabilité qu'un obstacle apparaisse
             }else{  //descend
                 x1 -= 1;
-                carte[x][solution] = 0;
+                carteI[x][solution] = 0;
             }
-            carte[x][solution+2] = 0;   //met le sol (0= vide, 1 = rempli)
-            carte[x][solution+1] = 0;
-            carte[x][solution -1] = 1;
-            carte[x + 1][solution+2] = 0;
-            carte[x + 1][solution+1] = 0;
-            carte[x + 1][solution] = 0;
-            carte[x + 1][solution -1] = 1;
-            for (int y = 0; y< carte[0].length;y++){
-                if (carte[x][y] == 1){  //sol
+            carteI[x][solution+2] = 0;   //met le sol (0= vide, 1 = rempli)
+            carteI[x][solution+1] = 0;
+            carteI[x][solution -1] = 1;
+            carteI[x + 1][solution+2] = 0;
+            carteI[x + 1][solution+1] = 0;
+            carteI[x + 1][solution] = 0;
+            carteI[x + 1][solution -1] = 1;
+            for (int y = 0; y< carteI[0].length;y++){
+                if (carteI[x][y] == 1){  //sol
                     sol.setCell(x+longueurE,y,cellule);
                     sol.setCell(x+1+longueurE,y,cellule);
-                }else if (carte[x][y] ==-1 || carte[x][y]==-2){     //obstacle
+                }else if (carteI[x][y] ==-1 || carteI[x][y] ==-2){     //obstacle
                     obstacles.setCell(x+longueurE,y-1,cellule2);
                 }
-                else if(carte[x][y] ==-3 || carte[x][y] == -4){     //obstacle
+                else if(carteI[x][y] == -3 || carteI[x][y] == -4){     //obstacle
                     obstacles.setCell(x+longueurE+1,y-1,cellule2);
-                }else if(carte[x][y] ==-5){     //obstacle double
+                }else if(carteI[x][y] ==-5){     //obstacle double
                     obstacles.setCell(x+longueurE,y-1,cellule2);
                     obstacles.setCell(x+longueurE+1,y-1,cellule2);
                 }
             }
             int z = MathUtils.random(0,200);
             if (z<10){      //argent (pièce)
-                if (z%2==0 && carte[x][solution]!=1){   //au niveau du sol
+                if (z%2==0 && carteI[x][solution]!=1){   //au niveau du sol
                     special.setCell(x+longueurE,solution,cellule4);
                 }else{      //en l'air
                     special.setCell(x+longueurE,solution+2,cellule4);
@@ -501,7 +552,6 @@ public class EcranInfini extends ScreenAdapter {
                 special.setCell(x+longueurE,solution+1,cellule3);
             }
         }
-
     }
 
     //toutes les bonnes choses ont une fin
@@ -526,7 +576,7 @@ public class EcranInfini extends ScreenAdapter {
         static float IMPULSION_SAUT;
 
         enum Etat {
-            Attend,Marche,Cours,Vole
+            Attend,Marche,Vole
         }
 
         final Vector2 position = new Vector2();

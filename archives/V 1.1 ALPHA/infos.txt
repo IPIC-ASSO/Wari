@@ -1,2 +1,0 @@
-Bouton pause, mode infini retravaillé, zones de collision retravaillées, premières fenêtres de dialogue
-OBJECTIFS HEBDOMADAIRE ATTEINTS. (1 jour d'avance)
