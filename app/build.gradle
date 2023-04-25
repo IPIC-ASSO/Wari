@@ -87,7 +87,9 @@ project(":ios") {
     }
 
     robovm {
-        iosSkipSigning = true
+        iosSignIdentity = "IPIC-ASSO"
+        iosProvisioningProfile = "profile warai"
+        iosSkipSigning = false
         archs = "thumbv7:arm64"
     }
 }
