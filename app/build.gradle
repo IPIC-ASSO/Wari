@@ -1,6 +1,4 @@
 buildscript {
-    
-
     repositories {
         mavenLocal()
         mavenCentral()
@@ -11,8 +9,7 @@ buildscript {
     dependencies {
         classpath 'org.wisepersist:gwt-gradle-plugin:1.1.16'
         classpath 'org.gretty:gretty:3.0.7'
-        classpath 'com.android.tools.build:gradle:7.3.1'
-        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.16'
+        classpath 'com.android.tools.build:gradle:7.4.2'
     }
 }
 
@@ -74,7 +71,6 @@ project(":android") {
 
 project(":ios") {
     apply plugin: "java-library"
-    apply plugin: "robovm"
 
 
     dependencies {
@@ -86,12 +82,12 @@ project(":ios") {
         implementation 'com.github.raeleus.stripe:stripe:1.4.1'
     }
 
-    robovm {
+    /*robovm {
         iosSignIdentity = "IPIC-ASSO"
         iosProvisioningProfile = "profile warai"
         iosSkipSigning = false
         archs = "thumbv7:arm64"
-    }
+    }*/
 }
 
 project(":html") {

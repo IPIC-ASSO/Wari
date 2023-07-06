@@ -7,13 +7,13 @@ ext {
 	mainClassName = "com.ipiccie.wari.IOSLauncher"
 }
 
-launchIPhoneSimulator.dependsOn build
-launchIPadSimulator.dependsOn build
-launchIOSDevice.dependsOn build
-createIPA.dependsOn build
+//launchIPhoneSimulator.dependsOn build
+//launchIPadSimulator.dependsOn build
+//launchIOSDevice.dependsOn build
+//createIPA.dependsOn build
 
-robovm {
+/*robovm {
 	archs = "thumbv7:arm64"
-}
+}*/
 
 eclipse.project.name = appName + "-ios"
